@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Il2CppInterop.Runtime.Attributes;
 using MiSide_VR.Core;
 using UnityEngine;
@@ -47,8 +47,9 @@ public class VRController : MonoBehaviour {
 		var muzzleObj = new GameObject("Muzzle");
 		muzzleObj.transform.SetParent(model, false);
 		muzzleObj.layer = VRPlayer.VrPointerLayer;
-		muzzleObj.transform.localPosition = new Vector3(handType == HandType.Left ? FallbackAimInset : -FallbackAimInset, -FallbackAimDown, 0f);
-		muzzleObj.transform.localRotation = Quaternion.Euler(AimPitchDown, 0f, 0f);
+		var fallbackAim = FallbackAimPose;
+		muzzleObj.transform.localPosition = fallbackAim.Position;
+		muzzleObj.transform.localRotation = fallbackAim.Rotation;
 		muzzle = muzzleObj.transform;
 
 		_ray = muzzleObj.AddComponent<LineRenderer>();
@@ -98,6 +99,10 @@ public class VRController : MonoBehaviour {
 		var node = controllerHandType == HandType.Left ? XRNode.LeftHand : XRNode.RightHand;
 		return VRInput.TryGetControllerComponentPose(node, OpenVR.k_pch_Controller_Component_HandGrip, out pose) || VRInput.TryGetControllerComponentPose(node, OpenVR.k_pch_Controller_Component_OpenXR_Grip, out pose);
 	}
+
+	// Used when the runtime exposes no aim component (e.g. xrizer).
+	[HideFromIl2Cpp]
+	public TrackedPose FallbackAimPose => new(new Vector3(controllerHandType == HandType.Left ? FallbackAimInset : -FallbackAimInset, -FallbackAimDown, 0f), Quaternion.Euler(AimPitchDown, 0f, 0f));
 
 	[HideFromIl2Cpp]
 	public bool TryGetAimPose(out TrackedPose pose) {
