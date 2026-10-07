@@ -205,7 +205,6 @@ sealed class PlayerBodyIK : IDisposable {
 
 	private static Quaternion GetHandTargetRotation(VRController controller, bool leftHand, out bool resolved) {
 		resolved = controller.TryGetAimPose(out var aimPose);
-		// Match the laser fallback so the hand follows the controller instead of the bind-time animation pose.
 		return GetAimHandRotation(resolved ? aimPose : controller.FallbackAimPose, leftHand);
 	}
 
